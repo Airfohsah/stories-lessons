@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stories & Lessons - Authorization</title>
+<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 16px;line-height:1.5}code,textarea{width:100%;box-sizing:border-box;font-size:14px}textarea{height:90px}</style></head>
+<body>
+<h1>Authorization received</h1>
+<p>This page is the sign-in return address for the Stories &amp; Lessons app. Copy the full address of this page (or the code below) back into the app to finish connecting.</p>
+<p><strong>Code:</strong></p><textarea id="code" readonly></textarea>
+<p><strong>Status:</strong> <span id="status"></span></p>
+<script>
+var p=new URLSearchParams(location.search);
+document.getElementById('code').value=p.get('code')||'';
+document.getElementById('status').textContent=p.get('error')?('Error: '+p.get('error')+' '+(p.get('error_description')||'')):(p.get('code')?'Success':'No code in this address');
+</script>
+<p><a href="index.html">Home</a> · <a href="privacy_policy.html">Privacy Policy</a> · <a href="terms_of_service.html">Terms of Service</a></p>
+</body></html>
