@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stories & Lessons - Post to TikTok</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;max-width:780px;margin:30px auto;padding:0 16px;color:#1b1b1b;line-height:1.45}
+h1{margin-bottom:4px}.sub{color:#555;margin-top:0}
+.card{border:1px solid #ddd;border-radius:10px;padding:18px;margin:18px 0}
+button{font-size:16px;padding:10px 18px;border-radius:8px;border:0;background:#fe2c55;color:#fff;cursor:pointer}
+button.secondary{background:#eee;color:#222}button:disabled{opacity:.45;cursor:not-allowed}
+select,input[type=text],textarea{width:100%;box-sizing:border-box;font-size:15px;padding:8px;margin:6px 0}
+textarea{height:80px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.muted{color:#666;font-size:14px}.ok{color:#0a7a3d}.err{color:#b00020}
+video{width:100%;max-height:360px;background:#000;border-radius:8px}
+label.t{display:flex;gap:8px;align-items:center;margin:6px 0}
+#log{white-space:pre-wrap;font-size:14px}
+</style></head><body>
+<h1>Stories &amp; Lessons</h1>
+<p class="sub">A personal tool to post the owner's own original story videos to the owner's TikTok account. &nbsp;<a href="privacy_policy.html">Privacy Policy</a> · <a href="terms_of_service.html">Terms of Service</a></p>
+
+<div class="card" id="c1">
+<h2>1. Connect your TikTok account</h2>
+<p class="muted">Uses TikTok Login Kit. Permissions requested: view basic profile (user.info.basic), upload videos (video.upload) and publish videos (video.publish).</p>
+<div id="who" class="row"><span class="muted" id="helper">Checking the local helper…</span></div>
+<p><button id="connect">Connect TikTok</button> <button id="disconnect" class="secondary" style="display:none">Disconnect</button></p>
+</div>
+
+<div class="card" id="c2" style="opacity:.5;pointer-events:none">
+<h2>2. Choose a video and post it</h2>
+<label>Video</label>
+<select id="video"></select>
+<video id="preview" controls playsinline></video>
+<label style="margin-top:10px;display:block">Caption</label>
+<textarea id="caption" maxlength="2200" placeholder="Write a caption and hashtags"></textarea>
+<label>Who can view this video</label>
+<select id="privacy"><option value="">Select…</option></select>
+<p class="muted" style="margin:6px 0">Allow users to:</p>
+<label class="t"><input type="checkbox" id="allowComment"> Comment</label>
+<label class="t"><input type="checkbox" id="allowDuet"> Duet</label>
+<label class="t"><input type="checkbox" id="allowStitch"> Stitch</label>
+<label class="t"><input type="checkbox" id="commercial"> This video promotes a brand, product or service (commercial content disclosure)</label>
+<div id="commercialOpts" style="display:none;margin-left:24px">
+<label class="t"><input type="checkbox" id="yourBrand"> Your own brand</label>
+<label class="t"><input type="checkbox" id="thirdBrand"> A third-party brand (branded content)</label>
+</div>
+<p class="muted" id="declaration">By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Music Usage Confirmation</a>.</p>
+<p><button id="post" disabled>Post to TikTok</button></p>
+<div id="log" class="muted"></div>
+</div>
+
+<script>
+var H='http://127.0.0.1:8765', $=function(i){return document.getElementById(i)};
+function j(path,opt){return fetch(H+path,opt).then(function(r){return r.json()})}
+function log(t,c){$('log').className=c||'muted';$('log').textContent=t}
+var cfg=null, creator=null;
+function refresh(){
+  j('/status').then(function(s){
+    $('helper').textContent='';
+    if(s.connected){
+      creator=s.creator;
+      $('who').innerHTML='<img class="avatar" src="'+creator.creator_avatar_url+'" alt=""><div><strong>'+creator.creator_nickname+'</strong><br><span class="muted">@'+creator.creator_username+' · connected</span></div>';
+      $('connect').style.display='none';$('disconnect').style.display='';
+      var sel=$('privacy');sel.innerHTML='<option value="">Select…</option>';
+      var names={PUBLIC_TO_EVERYONE:'Everyone',MUTUAL_FOLLOW_FRIENDS:'Friends',SELF_ONLY:'Only me',FOLLOWER_OF_CREATOR:'Followers'};
+      (creator.privacy_level_options||[]).forEach(function(o){var e=document.createElement('option');e.value=o;e.textContent=names[o]||o;sel.appendChild(e)});
+      $('allowComment').disabled=!!creator.comment_disabled;$('allowDuet').disabled=!!creator.duet_disabled;$('allowStitch').disabled=!!creator.stitch_disabled;
+      $('c2').style.opacity=1;$('c2').style.pointerEvents='auto';
+      j('/videos').then(function(v){var s=$('video');s.innerHTML='';v.videos.forEach(function(n){var e=document.createElement('option');e.value=n;e.textContent=n;s.appendChild(e)});setPreview()});
+    } else {
+      $('who').innerHTML='<span class="muted">Not connected.</span>';
+      $('connect').style.display='';$('disconnect').style.display='none';
+      $('c2').style.opacity=.5;$('c2').style.pointerEvents='none';
+    }
+  }).catch(function(){$('helper').innerHTML='<span class="err">The local helper is not running on this computer. Start it first (tiktok_server.py).</span>';});
+}
+function setPreview(){var n=$('video').value;if(n){$('preview').src=H+'/video/'+encodeURIComponent(n)}}
+function ready(){var ok=$('privacy').value!=='';if($('commercial').checked&&!$('yourBrand').checked&&!$('thirdBrand').checked)ok=false;$('post').disabled=!ok}
+$('video').onchange=setPreview;$('privacy').onchange=function(){
+  var pub=$('privacy').value==='PUBLIC_TO_EVERYONE';ready()};
+$('commercial').onchange=function(){$('commercialOpts').style.display=this.checked?'block':'none';ready()};
+$('yourBrand').onchange=$('thirdBrand').onchange=ready;
+$('connect').onclick=function(){
+  j('/config').then(function(c){
+    var state=Math.random().toString(36).slice(2);try{localStorage.setItem('tt_state',state)}catch(e){}
+    location.href='https://www.tiktok.com/v2/auth/authorize/?client_key='+encodeURIComponent(c.client_key)+'&scope='+encodeURIComponent(c.scopes)+'&response_type=code&redirect_uri='+encodeURIComponent(c.redirect)+'&state='+state;
+  }).catch(function(){log('Start the local helper first.','err')});
+};
+$('disconnect').onclick=function(){j('/disconnect',{method:'POST',body:'{}'}).then(refresh)};
+$('post').onclick=function(){
+  $('post').disabled=true;log('Uploading to TikTok…');
+  var body={file:$('video').value,caption:$('caption').value,privacy:$('privacy').value,
+    disable_comment:!$('allowComment').checked,disable_duet:!$('allowDuet').checked,disable_stitch:!$('allowStitch').checked,
+    brand_content:$('commercial').checked&&$('thirdBrand').checked,brand_organic:$('commercial').checked&&$('yourBrand').checked};
+  j('/post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
+    if(!r.ok){log('TikTok refused the post: '+JSON.stringify(r.response&&r.response.error||r),'err');ready();return}
+    log('Uploaded. Waiting for TikTok to process (publish id '+r.publish_id+')…');
+    var n=0;(function poll(){j('/post_status?id='+encodeURIComponent(r.publish_id)).then(function(s){
+      var st=s.data&&s.data.status;log('TikTok status: '+st);
+      if(st==='PUBLISH_COMPLETE'){log('Posted. TikTok status: PUBLISH_COMPLETE','ok');ready()}
+      else if(st==='FAILED'){log('Failed: '+JSON.stringify(s.data),'err');ready()}
+      else if(n++<40)setTimeout(poll,5000)})})();
+  }).catch(function(e){log('Error: '+e,'err');ready()});
+};
+refresh();
+</script>
+</body></html>

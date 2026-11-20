@@ -1,15 +1,24 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Stories & Lessons - Authorization</title>
-<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 16px;line-height:1.5}code,textarea{width:100%;box-sizing:border-box;font-size:14px}textarea{height:90px}</style></head>
+<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 16px;line-height:1.5}textarea{width:100%;box-sizing:border-box;font-size:14px;height:90px}</style></head>
 <body>
 <h1>Authorization received</h1>
-<p>This page is the sign-in return address for the Stories &amp; Lessons app. Copy the full address of this page (or the code below) back into the app to finish connecting.</p>
-<p><strong>Code:</strong></p><textarea id="code" readonly></textarea>
-<p><strong>Status:</strong> <span id="status"></span></p>
+<p id="msg">Finishing the connection…</p>
+<p>If the app does not pick this up automatically, copy the code below back into the app.</p>
+<textarea id="code" readonly></textarea>
+<p><a href="app.html">Back to the app</a> · <a href="privacy_policy.html">Privacy Policy</a> · <a href="terms_of_service.html">Terms of Service</a></p>
 <script>
-var p=new URLSearchParams(location.search);
-document.getElementById('code').value=p.get('code')||'';
-document.getElementById('status').textContent=p.get('error')?('Error: '+p.get('error')+' '+(p.get('error_description')||'')):(p.get('code')?'Success':'No code in this address');
+var p=new URLSearchParams(location.search), code=p.get('code'), err=p.get('error');
+document.getElementById('code').value=code||'';
+var msg=document.getElementById('msg');
+if(err){msg.textContent='Authorization was not completed: '+err+' '+(p.get('error_description')||'')}
+else if(!code){msg.textContent='No authorization code in this address.'}
+else{
+  fetch('http://127.0.0.1:8765/callback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,state:p.get('state')})})
+   .then(function(r){return r.json()}).then(function(d){
+     if(d.ok){msg.textContent='Connected. Returning to the app…';setTimeout(function(){location.href='app.html'},1200)}
+     else{msg.textContent='Could not finish: '+(d.error||'unknown error')}
+   }).catch(function(){msg.textContent='The local helper is not running, so the connection could not be completed. Start it and reload this page.'});
+}
 </script>
-<p><a href="index.html">Home</a> · <a href="privacy_policy.html">Privacy Policy</a> · <a href="terms_of_service.html">Terms of Service</a></p>
 </body></html>
