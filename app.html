@@ -2,66 +2,107 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Stories & Lessons - Post to TikTok</title>
 <style>
-body{font-family:Arial,Helvetica,sans-serif;max-width:780px;margin:30px auto;padding:0 16px;color:#1b1b1b;line-height:1.45}
-h1{margin-bottom:4px}.sub{color:#555;margin-top:0}
-.card{border:1px solid #ddd;border-radius:10px;padding:18px;margin:18px 0}
-button{font-size:16px;padding:10px 18px;border-radius:8px;border:0;background:#fe2c55;color:#fff;cursor:pointer}
-button.secondary{background:#eee;color:#222}button:disabled{opacity:.45;cursor:not-allowed}
-select,input[type=text],textarea{width:100%;box-sizing:border-box;font-size:15px;padding:8px;margin:6px 0}
-textarea{height:80px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f6f6f7;color:#161823;line-height:1.45}
+header{background:#fff;border-bottom:1px solid #e3e3e4;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header h1{font-size:20px;margin:0}header a{color:#555;font-size:14px;margin-left:14px}
+main{max-width:1040px;margin:0 auto;padding:20px 16px 60px}
+h2{font-size:18px;margin:26px 0 10px}
+.card{background:#fff;border:1px solid #e3e3e4;border-radius:10px;padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 300px;gap:20px}@media(max-width:820px){.grid{grid-template-columns:1fr}}
+button{font-size:15px;padding:10px 22px;border-radius:6px;border:0;background:#fe2c55;color:#fff;cursor:pointer}
+button.secondary{background:#e8e8ea;color:#161823}button.chip{background:#f1f1f2;color:#161823;padding:5px 12px;font-size:14px}
+button:disabled{opacity:.4;cursor:not-allowed}
+select,textarea,input[type=text]{width:100%;font-size:15px;padding:9px;border:1px solid #d0d0d3;border-radius:6px;background:#f1f1f2;font-family:inherit}
+textarea{height:110px;resize:vertical}
+label.f{display:block;font-weight:bold;margin:14px 0 6px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}
-.muted{color:#666;font-size:14px}.ok{color:#0a7a3d}.err{color:#b00020}
-video{width:100%;max-height:360px;background:#000;border-radius:8px}
-label.t{display:flex;gap:8px;align-items:center;margin:6px 0}
-#log{white-space:pre-wrap;font-size:14px}
+.muted{color:#6b6b72;font-size:13px}.ok{color:#0a7a3d}.err{color:#b00020}
+.sw{display:flex;align-items:center;gap:10px;margin:8px 0}
+.sw input{width:18px;height:18px}
+.phone{background:#000;border-radius:18px;padding:8px;color:#fff}
+.phone video{width:100%;aspect-ratio:9/16;object-fit:contain;background:#000;border-radius:10px;display:block}
+.phone .meta{padding:8px 4px;font-size:13px}
+#log{white-space:pre-wrap;font-size:14px;margin-top:10px}
+.note{background:#fff7e0;border:1px solid #f0dca0;border-radius:6px;padding:8px 10px;font-size:13px;margin:8px 0}
+input[type=range]{width:100%}
 </style></head><body>
-<h1>Stories &amp; Lessons</h1>
-<p class="sub">A personal tool to post the owner's own original story videos to the owner's TikTok account. &nbsp;<a href="privacy_policy.html">Privacy Policy</a> · <a href="terms_of_service.html">Terms of Service</a></p>
+<header><h1>Stories &amp; Lessons</h1><div><a href="index.html">Home</a><a href="privacy_policy.html">Privacy Policy</a><a href="terms_of_service.html">Terms of Service</a></div></header>
+<main>
+<p class="muted">A personal tool that posts the owner's own original story videos to the owner's TikTok account using TikTok Login Kit and the Content Posting API (direct post). Permissions: user.info.basic, video.upload, video.publish.</p>
 
 <div class="card" id="c1">
-<h2>1. Connect your TikTok account</h2>
-<p class="muted">Uses TikTok Login Kit. Permissions requested: view basic profile (user.info.basic), upload videos (video.upload) and publish videos (video.publish).</p>
+<h2 style="margin-top:0">1. Connect your TikTok account</h2>
 <div id="who" class="row"><span class="muted" id="helper">Checking the local helper…</span></div>
 <p><button id="connect">Connect TikTok</button> <button id="disconnect" class="secondary" style="display:none">Disconnect</button></p>
 </div>
 
-<div class="card" id="c2" style="opacity:.5;pointer-events:none">
-<h2>2. Choose a video and post it</h2>
-<label>Video</label>
-<select id="video"></select>
-<video id="preview" controls playsinline></video>
-<label style="margin-top:10px;display:block">Caption</label>
-<textarea id="caption" maxlength="2200" placeholder="Write a caption and hashtags"></textarea>
-<label>Who can view this video</label>
-<select id="privacy"><option value="">Select…</option></select>
-<p class="muted" style="margin:6px 0">Allow users to:</p>
-<label class="t"><input type="checkbox" id="allowComment"> Comment</label>
-<label class="t"><input type="checkbox" id="allowDuet"> Duet</label>
-<label class="t"><input type="checkbox" id="allowStitch"> Stitch</label>
-<label class="t"><input type="checkbox" id="commercial"> This video promotes a brand, product or service (commercial content disclosure)</label>
-<div id="commercialOpts" style="display:none;margin-left:24px">
-<label class="t"><input type="checkbox" id="yourBrand"> Your own brand</label>
-<label class="t"><input type="checkbox" id="thirdBrand"> A third-party brand (branded content)</label>
+<div id="c2" style="opacity:.45;pointer-events:none">
+<h2>2. Upload a video</h2>
+<div class="card"><label class="f" style="margin-top:0">Video</label><select id="video"></select></div>
+<div class="grid"><div>
+
+<h2>Details</h2>
+<div class="card">
+<label class="f" style="margin-top:0">Description</label>
+<textarea id="caption" maxlength="2200" placeholder="Write a description"></textarea>
+<div class="row" style="justify-content:space-between"><span class="row"><button class="chip" id="addHash" type="button"># Hashtags</button><button class="chip" id="addMention" type="button">@ Mention</button></span><span class="muted"><span id="count">0</span>/2200</span></div>
+<label class="f">Cover</label>
+<p class="muted" style="margin:0 0 6px">Choose the frame used as the cover: <strong id="coverLabel">0.0 s</strong></p>
+<input type="range" id="cover" min="0" max="1000" value="0" step="1">
 </div>
-<p class="muted" id="declaration">By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Music Usage Confirmation</a>.</p>
-<p><button id="post" disabled>Post to TikTok</button></p>
+
+<h2>Settings</h2>
+<div class="card">
+<label class="f" style="margin-top:0">Who can see this post</label>
+<select id="privacy"><option value="">Select…</option></select>
+<label class="f">Allow users to:</label>
+<p class="muted" id="privNote" style="margin:0 0 4px">Duet and Stitch aren't available on videos posted as Only you.</p>
+<div class="sw"><input type="checkbox" id="allowComment"><label for="allowComment">Comment</label></div>
+<div class="sw"><input type="checkbox" id="allowDuet"><label for="allowDuet">Duet</label></div>
+<div class="sw"><input type="checkbox" id="allowStitch"><label for="allowStitch">Stitch</label></div>
+<label class="f">Disclose post content</label>
+<div class="sw"><input type="checkbox" id="commercial"><label for="commercial">Let others know this post promotes a brand, product or service.</label></div>
+<div id="commercialOpts" style="display:none;margin-left:28px">
+<div class="sw"><input type="checkbox" id="yourBrand"><label for="yourBrand">Your brand — you are promoting yourself or your own business (labeled "Promotional content")</label></div>
+<div class="sw"><input type="checkbox" id="thirdBrand"><label for="thirdBrand">Branded content — you are promoting another brand or a third party (labeled "Paid partnership")</label></div>
+<div class="note" id="brandNote">Select at least one option to continue.</div>
+</div>
+<label class="f">AI-generated content</label>
+<div class="sw"><input type="checkbox" id="aigc"><label for="aigc">Add the AI-generated content label to this video.</label></div>
+</div>
+
+<div class="card">
+<p class="muted" id="declaration" style="margin-top:0">By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Music Usage Confirmation</a>.</p>
+<p style="margin-bottom:0"><button id="post" disabled>Post</button></p>
 <div id="log" class="muted"></div>
 </div>
+
+</div>
+<div>
+<h2>Preview</h2>
+<div class="phone"><video id="preview" controls playsinline></video>
+<div class="meta"><strong id="pvName">—</strong><br><span id="pvCap" class="muted" style="color:#ccc"></span></div></div>
+</div>
+</div></div>
+</main>
 
 <script>
 var H='http://127.0.0.1:8765', $=function(i){return document.getElementById(i)};
 function j(path,opt){return fetch(H+path,opt).then(function(r){return r.json()})}
 function log(t,c){$('log').className=c||'muted';$('log').textContent=t}
-var cfg=null, creator=null;
+var creator=null;
 function refresh(){
   j('/status').then(function(s){
     $('helper').textContent='';
     if(s.connected){
       creator=s.creator;
       $('who').innerHTML='<img class="avatar" src="'+creator.creator_avatar_url+'" alt=""><div><strong>'+creator.creator_nickname+'</strong><br><span class="muted">@'+creator.creator_username+' · connected</span></div>';
+      $('pvName').textContent=creator.creator_nickname;
       $('connect').style.display='none';$('disconnect').style.display='';
       var sel=$('privacy');sel.innerHTML='<option value="">Select…</option>';
-      var names={PUBLIC_TO_EVERYONE:'Everyone',MUTUAL_FOLLOW_FRIENDS:'Friends',SELF_ONLY:'Only me',FOLLOWER_OF_CREATOR:'Followers'};
+      var names={PUBLIC_TO_EVERYONE:'Everyone',MUTUAL_FOLLOW_FRIENDS:'Friends',FOLLOWER_OF_CREATOR:'Followers',SELF_ONLY:'Only you'};
       (creator.privacy_level_options||[]).forEach(function(o){var e=document.createElement('option');e.value=o;e.textContent=names[o]||o;sel.appendChild(e)});
       $('allowComment').disabled=!!creator.comment_disabled;$('allowDuet').disabled=!!creator.duet_disabled;$('allowStitch').disabled=!!creator.stitch_disabled;
       $('c2').style.opacity=1;$('c2').style.pointerEvents='auto';
@@ -69,16 +110,36 @@ function refresh(){
     } else {
       $('who').innerHTML='<span class="muted">Not connected.</span>';
       $('connect').style.display='';$('disconnect').style.display='none';
-      $('c2').style.opacity=.5;$('c2').style.pointerEvents='none';
+      $('c2').style.opacity=.45;$('c2').style.pointerEvents='none';
     }
   }).catch(function(){$('helper').innerHTML='<span class="err">The local helper is not running on this computer. Start it first (tiktok_server.py).</span>';});
 }
-function setPreview(){var n=$('video').value;if(n){$('preview').src=H+'/video/'+encodeURIComponent(n)}}
-function ready(){var ok=$('privacy').value!=='';if($('commercial').checked&&!$('yourBrand').checked&&!$('thirdBrand').checked)ok=false;$('post').disabled=!ok}
-$('video').onchange=setPreview;$('privacy').onchange=function(){
-  var pub=$('privacy').value==='PUBLIC_TO_EVERYONE';ready()};
+var vid=$('preview');
+function setPreview(){var n=$('video').value;if(n){vid.src=H+'/video/'+encodeURIComponent(n)}}
+vid.onloadedmetadata=function(){var ms=Math.floor(vid.duration*1000);$('cover').max=ms;$('cover').value=0;coverMove()};
+function coverMove(){var ms=parseInt($('cover').value||0);$('coverLabel').textContent=(ms/1000).toFixed(1)+' s';try{vid.currentTime=ms/1000}catch(e){}}
+$('cover').oninput=coverMove;
+$('video').onchange=setPreview;
+$('caption').oninput=function(){$('count').textContent=this.value.length;$('pvCap').textContent=this.value};
+$('addHash').onclick=function(){var t=$('caption');t.value+=(t.value&&!/\s$/.test(t.value)?' ':'')+'#';t.focus();t.oninput()};
+$('addMention').onclick=function(){var t=$('caption');t.value+=(t.value&&!/\s$/.test(t.value)?' ':'')+'@';t.focus();t.oninput()};
+function ready(){
+  var ok=$('privacy').value!=='';
+  if($('commercial').checked&&!$('yourBrand').checked&&!$('thirdBrand').checked)ok=false;
+  $('post').disabled=!ok}
+function privChange(){
+  var p=$('privacy').value;
+  var priv=(p==='SELF_ONLY');
+  $('allowDuet').disabled=priv||!!(creator&&creator.duet_disabled);$('allowStitch').disabled=priv||!!(creator&&creator.stitch_disabled);
+  if(priv){$('allowDuet').checked=false;$('allowStitch').checked=false}
+  // branded content cannot be private
+  $('thirdBrand').disabled=priv;if(priv)$('thirdBrand').checked=false;
+  ready()}
+$('privacy').onchange=privChange;
 $('commercial').onchange=function(){$('commercialOpts').style.display=this.checked?'block':'none';ready()};
-$('yourBrand').onchange=$('thirdBrand').onchange=ready;
+$('yourBrand').onchange=$('thirdBrand').onchange=function(){
+  var t=$('thirdBrand').checked,y=$('yourBrand').checked;
+  $('brandNote').textContent=t?'Your video will be labeled "Paid partnership".':(y?'Your video will be labeled "Promotional content".':'Select at least one option to continue.');ready()};
 $('connect').onclick=function(){
   j('/config').then(function(c){
     var state=Math.random().toString(36).slice(2);try{localStorage.setItem('tt_state',state)}catch(e){}
@@ -90,7 +151,8 @@ $('post').onclick=function(){
   $('post').disabled=true;log('Uploading to TikTok…');
   var body={file:$('video').value,caption:$('caption').value,privacy:$('privacy').value,
     disable_comment:!$('allowComment').checked,disable_duet:!$('allowDuet').checked,disable_stitch:!$('allowStitch').checked,
-    brand_content:$('commercial').checked&&$('thirdBrand').checked,brand_organic:$('commercial').checked&&$('yourBrand').checked};
+    brand_content:$('commercial').checked&&$('thirdBrand').checked,brand_organic:$('commercial').checked&&$('yourBrand').checked,
+    cover_ms:parseInt($('cover').value||0),is_aigc:$('aigc').checked};
   j('/post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
     if(!r.ok){log('TikTok refused the post: '+JSON.stringify(r.response&&r.response.error||r),'err');ready();return}
     log('Uploaded. Waiting for TikTok to process (publish id '+r.publish_id+')…');
