@@ -143,7 +143,7 @@ $('yourBrand').onchange=$('thirdBrand').onchange=function(){
 $('connect').onclick=function(){
   j('/config').then(function(c){
     var state=Math.random().toString(36).slice(2);try{localStorage.setItem('tt_state',state)}catch(e){}
-    location.href='https://www.tiktok.com/v2/auth/authorize/?client_key='+encodeURIComponent(c.client_key)+'&scope='+encodeURIComponent(c.scopes)+'&response_type=code&redirect_uri='+encodeURIComponent(c.redirect)+'&state='+state;
+    location.href='https://www.tiktok.com/v2/auth/authorize/?client_key='+encodeURIComponent(c.client_key)+'&scope='+encodeURIComponent(c.scopes)+'&response_type=code&disable_auto_auth=1&redirect_uri='+encodeURIComponent(c.redirect)+'&state='+state;
   }).catch(function(){log('Start the local helper first.','err')});
 };
 $('disconnect').onclick=function(){j('/disconnect',{method:'POST',body:'{}'}).then(refresh)};
